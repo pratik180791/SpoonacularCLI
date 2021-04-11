@@ -1,0 +1,9 @@
+{
+  "startMessage": "Welcome to Spoonacular - we are excited to serve you with some delicious recipes",
+  "inputRequest": "Please enter ingredients of your choice",
+  "ingredientsContinue": "Do you wish to add more ingredients? Enter (yes/y) to continue else (no/n)",
+  "continue": "Do you wish to continue? Press (yes/y) to continue else (no/n) to stop shopping anytime",
+  "invalidInput": "Oops! It seems you mistyped something there",
+  "getRecipes": "Great! You entered these ingredients {ingredient_list}, sit back and relax while we get some recipes just for you!",
+  "invalidIngredient": "Oh o, it seems you missed entering your ingredient"
+}

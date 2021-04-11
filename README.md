@@ -15,7 +15,7 @@ Ensure you are in `SpoonAppular`directory
 
 3: Install dependencies `make run`
 
-4: Run main code `python main.py "your input"`
+4: Run main code `python3 main.py "your input"`
 
 5: Deactivate virtualenv when done `deactivate`
 

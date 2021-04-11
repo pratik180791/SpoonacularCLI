@@ -4,7 +4,7 @@ KeyAuthenticator = namedtuple("KeyAuthenticator", ["url", "email", "password"], 
 
 
 class AuthenticationHandler:
-    def __init__(self, config: KeyAuthenticator = KeyAuthenticator(None, None, None)):
+    def __init__(self, config = KeyAuthenticator(None, None, None)):
         """
         :param config: Provision to provide an object with credentials needed to key/tokens perform authentication etc
         """
