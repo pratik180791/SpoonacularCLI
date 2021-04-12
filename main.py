@@ -1,7 +1,7 @@
-from SpoonacularCLI.helpers import file_helper
+
 from SpoonacularCLI.spoonacular_client import SpoonacularClient
+
 if __name__ == "__main__":
-    configs = file_helper.get_generic_configs()
     spoonacular_client = SpoonacularClient()
     ingredient_list = spoonacular_client.get_ingredients_from_user()
     spoonacular_client.recommend_recipies(ingredient_list=ingredient_list)
