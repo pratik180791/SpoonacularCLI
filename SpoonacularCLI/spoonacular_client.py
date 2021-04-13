@@ -1,14 +1,14 @@
-import ast
+
 import json
 from enum import Enum
-from typing import Dict, List, Optional
+from typing import Dict, List
 from urllib import parse
 
-import pandas as pd
+
 import requests
 
-from .helpers.generic_helpers import get_generic_configs
-from .settings.authentication_handler import AuthenticationHandler
+from .helpers.generic_helpers import get_generic_configs, format_list_to_dataframe, validate_input
+from SpoonacularCLI.utils.authentication_handler import AuthenticationHandler
 from .utils.exception import InvalidInputException
 
 
@@ -30,32 +30,15 @@ class SpoonacularClient:
     def configs(self):
         return get_generic_configs()
 
-    def validate_input(
-        self, input_message: str, invalid_message: str, acceptable_values: list = None
-    ) -> str:
-        while True:
-            input_value = input(input_message)
-            if not input_value:
-                print(invalid_message)
-                continue
-            if acceptable_values:
-                if input_value.lower().strip() in acceptable_values:
-                    return input_value
-                else:
-                    print(invalid_message)
-                    continue
-            break
-        return input_value
-
     def get_ingredients_from_user(self) -> set:
         ingredient_list = set()
         while True:
-            ingredient_name = self.validate_input(
+            ingredient_name = validate_input(
                 input_message=self.configs["inputRequest"],
                 invalid_message=self.configs["invalidIngredient"],
             )
             ingredient_list.add(ingredient_name.lower().strip())
-            continue_ingredients = self.validate_input(
+            continue_ingredients = validate_input(
                 invalid_message=self.configs["invalidInput"],
                 input_message=self.configs["ingredientsContinue"],
                 acceptable_values=SpoonacularEnums.YES.value
@@ -134,10 +117,10 @@ class SpoonacularClient:
             print("\n")
             recipe_list = self.filter_recipe_output(recipe)
             if recipe_list:
-                recipe_list[0]["Recipe Details"] = self.format_list_to_dataframe(
+                recipe_list[0]["Recipe Details"] = format_list_to_dataframe(
                     recipe_list[0]["Recipe Details"]
                 )
-            print(self.format_list_to_dataframe(json.dumps(recipe_list)))
+            print(format_list_to_dataframe(json.dumps(recipe_list)))
             print("\n")
 
             acceptable_values = (
@@ -145,7 +128,7 @@ class SpoonacularClient:
                 + SpoonacularEnums.NO.value
                 + [SpoonacularEnums.EXIT.value]
             )
-            like_dislike = self.validate_input(
+            like_dislike = validate_input(
                 input_message=self.configs["recipeLikeDislike"],
                 invalid_message=self.configs["invalidInput"],
                 acceptable_values=acceptable_values,
@@ -168,9 +151,8 @@ class SpoonacularClient:
         :return: Doesn't return anything but prints the formatted output of the missing ingredients added
         to shopping list based on user's selections
         """
-        total_amount = 0
-        final_list = []
-        cnt = 1
+        total_amount, cnt, final_list = 0, 1, []
+
         for i in shopping_list:
             total_amount += i["amount"]
             final_list.append(
@@ -183,24 +165,12 @@ class SpoonacularClient:
                 }
             )
             cnt += 1
-        presented_shopping_list = self.format_list_to_dataframe(json.dumps(final_list))
+        presented_shopping_list = format_list_to_dataframe(json.dumps(final_list))
         print(presented_shopping_list)
         print("\nYour total shopping amount will be: %.2f$" % total_amount)
         print(
             self.configs["thankYouShopping"].format(
                 liked_count=self.user_stats["liked"],
-                total_count=self.user_stats["total_count"],
+                total_count=self.user_stats["total_count"]
             )
         )
-
-    @staticmethod
-    def format_list_to_dataframe(shopping_list: str) -> Optional[str]:
-        """
-        :param shopping_list: Takes in input json in form of a string value
-        :return: Formatted tabular output of the json sent
-        """
-        val = ast.literal_eval(shopping_list)
-        val1 = json.loads(json.dumps(val))
-        pd.set_option("colheader_justify", "right")
-        val1 = pd.DataFrame(val1)
-        return val1.to_markdown(index=False, tablefmt="grid")

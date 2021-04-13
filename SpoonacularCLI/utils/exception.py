@@ -8,7 +8,6 @@ class ClientBaseException(Exception):
 
 class InvalidInputException(Exception):
     pass
-    #print("Invalid Input provided")
 
 
 class UnknownException(Exception):
