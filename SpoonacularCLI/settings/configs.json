@@ -1,0 +1,12 @@
+{
+  "startMessage": "Welcome to Spoonacular - we are excited to serve you with some delicious recipes!!!",
+  "inputRequest": "\nPlease enter ingredient of your choice: ",
+  "ingredientsContinue": "\nDo you wish to add more ingredients? Enter (yes/y) to continue else (no/n): ",
+  "continue": "\nDo you wish to continue? Press (yes/y) to continue else (no/n) to stop shopping anytime: ",
+  "invalidInput": "Oops! It seems you mistyped something there, please reenter your choice",
+  "getRecipes": "\nGreat! You entered these ingredients {ingredient_list}, sit back and relax while we get our best recipes just for you!",
+  "invalidIngredient": "\nOops! It seems you missed entering your ingredient.",
+  "spoonacularUrl": "https://api.spoonacular.com",
+  "recipeLikeDislike": "\nDid you like this recipe? Press (yes/y) if you did else (no/n) to see new recipes, else enter (exit/EXIT) anytime: ",
+  "thankYouShopping": "\nThank you for checking out our recipes and shopping with us. You checked {total_count} of our recipes and liked {liked_count} of them. \nWe hope you'll come back to check more recipes, until then, Goodbye!!"
+}

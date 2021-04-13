@@ -26,10 +26,10 @@ update-requirements: install
 	.venv/bin/pip install -U flake8
 
 black: .venv/bin/black # Formats code with black
-	.venv/bin/black code/*.py
+	.venv/bin/black SpoonacularCLI/*.py
 
 isort: .venv/bin/isort # Sorts imports using isort
-	.venv/bin/isort code/*.py
+	.venv/bin/isort SpoonacularCLI/*.py
 
 flake8: .venv/bin/flake8 # Lints code using flake8
-	.venv/bin/flake8 --max-line-length=120 code/*.py
+	.venv/bin/flake8 --max-line-length=120 SpoonacularCLI/*.py

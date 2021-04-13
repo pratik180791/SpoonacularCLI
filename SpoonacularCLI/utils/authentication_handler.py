@@ -4,7 +4,7 @@ KeyAuthenticator = namedtuple("KeyAuthenticator", ["url", "email", "password"], 
 
 
 class AuthenticationHandler:
-    def __init__(self, config: KeyAuthenticator = KeyAuthenticator(None, None, None)):
+    def __init__(self, config= KeyAuthenticator(None, None, None)):
         """
         :param config: Provision to provide an object with credentials needed to key/tokens perform authentication etc
         """
@@ -20,5 +20,4 @@ class AuthenticationHandler:
         This is a placeholder to interact with service and get keys/tokens for authentication based on configs provided
         :return:
         """
-        if not self.config.url and not self.config.password and not self.config.email:
-            return "NOT IMPLEMENTED"
+        return "NOT IMPLEMENTED"
