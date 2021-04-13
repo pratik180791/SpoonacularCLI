@@ -1,13 +1,13 @@
 import ast
 import json
 from enum import Enum
-from typing import List, Optional, Dict
+from typing import Dict, List, Optional
 from urllib import parse
 
 import pandas as pd
 import requests
 
-from .helpers.file_helper import get_generic_configs
+from .helpers.generic_helpers import get_generic_configs
 from .settings.authentication_handler import AuthenticationHandler
 from .utils.exception import InvalidInputException
 
@@ -30,7 +30,9 @@ class SpoonacularClient:
     def configs(self):
         return get_generic_configs()
 
-    def validate_input(self, input_message, invalid_message, acceptable_values=None) -> str:
+    def validate_input(
+        self, input_message: str, invalid_message: str, acceptable_values: list = None
+    ) -> str:
         while True:
             input_value = input(input_message)
             if not input_value:
@@ -48,13 +50,17 @@ class SpoonacularClient:
     def get_ingredients_from_user(self) -> set:
         ingredient_list = set()
         while True:
-            ingredient_name = self.validate_input(input_message=self.configs["inputRequest"],
-                                                  invalid_message=self.configs["invalidIngredient"])
+            ingredient_name = self.validate_input(
+                input_message=self.configs["inputRequest"],
+                invalid_message=self.configs["invalidIngredient"],
+            )
             ingredient_list.add(ingredient_name.lower().strip())
-            continue_ingredients = self.validate_input(invalid_message=self.configs["invalidInput"],
-                                                       input_message=self.configs["ingredientsContinue"],
-                                                       acceptable_values=SpoonacularEnums.YES.value +
-                                                                         SpoonacularEnums.NO.value)
+            continue_ingredients = self.validate_input(
+                invalid_message=self.configs["invalidInput"],
+                input_message=self.configs["ingredientsContinue"],
+                acceptable_values=SpoonacularEnums.YES.value
+                + SpoonacularEnums.NO.value,
+            )
 
             if continue_ingredients.lower() in SpoonacularEnums.NO.value:
                 break
@@ -85,57 +91,87 @@ class SpoonacularClient:
             print(str(exp))
             pass
 
-    def filter_recipe_output(self, recipe: Dict) -> List:
+    @staticmethod
+    def filter_recipe_output(recipe: Dict) -> List:
         if not recipe:
             return []
 
         all_ingredients = []
         for ingredients in recipe["usedIngredients"] + recipe["missedIngredients"]:
-            all_ingredients.append({"Ingredient Name": ingredients["name"],
-                                    "Usage Description": ingredients["original"]})
-        return [{"Recipe Name": recipe["title"],
-                 "Total Number Of Ingredients": recipe.get("usedIngredientCount", 0) + recipe.get(
-                     "missedIngredientCount", 0),
-                "Recipe Details": json.dumps(all_ingredients)}
-                ]
+            all_ingredients.append(
+                {
+                    "Ingredient Name": ingredients["name"],
+                    "Usage Description": ingredients["original"],
+                }
+            )
+        return [
+            {
+                "Recipe Name": recipe["title"],
+                "Total Number Of Ingredients": recipe.get("usedIngredientCount", 0)
+                + recipe.get("missedIngredientCount", 0),
+                "Recipe Details": json.dumps(all_ingredients),
+            }
+        ]
 
-    def recommend_recipies(self, ingredient_list: set):
+    def recommend_recipies(self, ingredient_list: set) -> List:
+        """
+        This method does an GET request call to spoonacular API to present user
+        with a set of recipes in a formatted way.
+        It applies a descending order sorting based on fetched recipes with key as number of likes in api.
+        That way user views most popular recipes first
+        :param ingredient_list: List of ingredients chosen by a user
+        :return: List of missing ingredients of the recipes user liked
+        """
         all_recipes = []
-        liked_count = 0
-        total_count = 0
+        liked_count, total_count = 0, 0
+
         for ingredient in ingredient_list:
             all_recipes.extend(self.get_recipes(ingredient))
 
-        #Sort recipies based on popularity(Number of likes)
-        all_recipes = sorted(all_recipes, key=lambda i: i.get('likes', 0), reverse=True)
+        all_recipes = sorted(all_recipes, key=lambda i: i.get("likes", 0), reverse=True)
 
         for recipe in all_recipes:
             print("\n")
             recipe_list = self.filter_recipe_output(recipe)
             if recipe_list:
-                recipe_list[0]["Recipe Details"] = self.format_list_to_dataframe(recipe_list[0]["Recipe Details"])
+                recipe_list[0]["Recipe Details"] = self.format_list_to_dataframe(
+                    recipe_list[0]["Recipe Details"]
+                )
             print(self.format_list_to_dataframe(json.dumps(recipe_list)))
             print("\n")
 
-            acceptable_values = SpoonacularEnums.YES.value + SpoonacularEnums.NO.value + [SpoonacularEnums.EXIT.value]
-            like_dislike = self.validate_input(input_message=self.configs["recipeLikeDislike"],
-                                               invalid_message=self.configs["invalidInput"],
-                                               acceptable_values=acceptable_values)
+            acceptable_values = (
+                SpoonacularEnums.YES.value
+                + SpoonacularEnums.NO.value
+                + [SpoonacularEnums.EXIT.value]
+            )
+            like_dislike = self.validate_input(
+                input_message=self.configs["recipeLikeDislike"],
+                invalid_message=self.configs["invalidInput"],
+                acceptable_values=acceptable_values,
+            )
             total_count += 1
             if like_dislike.lower().strip() in SpoonacularEnums.YES.value:
                 self.shopping_list.extend(recipe["missedIngredients"])
                 liked_count += 1
 
-            if like_dislike.lower().strip() == SpoonacularEnums.EXIT.value:
+            elif like_dislike.lower().strip() == SpoonacularEnums.EXIT.value:
                 self.shopping_list.extend(recipe["missedIngredients"])
                 break
         self.user_stats = {"liked": liked_count, "total_count": total_count}
+        return self.shopping_list
 
-    def process_missing_ingredients(self):
+    def process_missing_ingredients(self, shopping_list: List) -> None:
+        """
+
+        :param shopping_list: List of missing ingredients added in the shopping list based on user's liked recipes
+        :return: Doesn't return anything but prints the formatted output of the missing ingredients added
+        to shopping list based on user's selections
+        """
         total_amount = 0
         final_list = []
         cnt = 1
-        for i in self.shopping_list:
+        for i in shopping_list:
             total_amount += i["amount"]
             final_list.append(
                 {
@@ -150,11 +186,19 @@ class SpoonacularClient:
         presented_shopping_list = self.format_list_to_dataframe(json.dumps(final_list))
         print(presented_shopping_list)
         print("\nYour total shopping amount will be: %.2f$" % total_amount)
-        print(self.configs["thankYouShopping"].format(liked_count=self.user_stats["liked"],
-                                                      total_count=self.user_stats["total_count"]))
+        print(
+            self.configs["thankYouShopping"].format(
+                liked_count=self.user_stats["liked"],
+                total_count=self.user_stats["total_count"],
+            )
+        )
 
     @staticmethod
     def format_list_to_dataframe(shopping_list: str) -> Optional[str]:
+        """
+        :param shopping_list: Takes in input json in form of a string value
+        :return: Formatted tabular output of the json sent
+        """
         val = ast.literal_eval(shopping_list)
         val1 = json.loads(json.dumps(val))
         pd.set_option("colheader_justify", "right")
