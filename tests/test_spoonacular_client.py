@@ -78,22 +78,3 @@ class TestSpoonacularClient(TestCase):
                         'image': 'https://spoonacular.com/cdn/ingredients_100x100/pork-tenderloin-raw.png'}]
 
         self.assertEqual(op, expected_op)
-
-    """
-    #@patch('builtins.input', return_value="Sample Input")
-    def test_input_prompts(self):
-        #out, err = self.capsys.readouterr()
-        with patch('builtins.input', return_value="ABC"):
-            output = self.SpoonacularClient.validate_input(input_message="Enter input of your choice",
-                                                           invalid_message="Invalid input, please try again",
-                                                           acceptable_values="yes"
-                                                           )
-            out, err = self.capsys.readouterr()
-            self.assertEqual(out, "abc")
-        
-        out, err = self.capsys.readouterr()
-        print(out)
-        print(err)
-        self.assertEqual(output, "Sample Input")
-        assert "Enter input of your choice" in out
-    """
