@@ -12,3 +12,6 @@ class InvalidInputException(Exception):
 
 class UnknownException(Exception):
     pass
+
+class SpoonacularClientException(Exception):
+    pass

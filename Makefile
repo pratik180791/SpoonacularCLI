@@ -2,16 +2,21 @@
 
 virtual: .venv/bin/pip
 
+default:
+	python3 main.py
+
 .venv/bin/pip:
 	virtualenv -p /usr/bin/python3 .venv
 
 install:
 	.venv/bin/pip install -Ur requirements.txt
 
-run: setup.py install isort black flake8
+setup: setup.py install isort black flake8
+
+run: setup default
 
 test:
-	python3 -m pytest
+	python3 -m pytest --cov=SpoonacularCLI tests/
 
 update-requirements: install
 	.venv/bin/pip freeze > requirements.txt
