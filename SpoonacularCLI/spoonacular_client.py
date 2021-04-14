@@ -1,14 +1,19 @@
-
 import json
 from enum import Enum
 from typing import Dict, List
 from urllib import parse
 
-
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
-from .helpers.generic_helpers import get_generic_configs, format_list_to_dataframe, validate_input
 from SpoonacularCLI.utils.authentication_handler import AuthenticationHandler
+
+from .helpers.generic_helpers import (
+    format_list_to_dataframe,
+    get_generic_configs,
+    validate_input,
+)
 from .utils.exception import InvalidInputException
 
 
@@ -23,8 +28,32 @@ class SpoonacularClient:
         print(self.configs["startMessage"])
         self.api_key = AuthenticationHandler().api_key()
         self.base_url = self.configs["spoonacularUrl"]
-        self.shopping_list = []
         self.user_stats = {}
+        self.shopping_list = []
+
+    @staticmethod
+    def requests_retry_session(
+        retries=5, backoff_factor=0.5, status_forcelist=[500, 502, 503, 504, 599]
+    ):
+        """
+
+        :param retries: Number of retries
+        :param backoff_factor: Backoff factor for retries
+        :param status_forcelist: HTTP Status forcelist to perform retries
+        :return: session Object
+        """
+        session = requests.Session()
+        retry = Retry(
+            total=retries,
+            read=retries,
+            connect=retries,
+            backoff_factor=backoff_factor,
+            status_forcelist=status_forcelist,
+        )
+        adapter = HTTPAdapter(max_retries=retry)
+        session.mount("http://", adapter)
+        session.mount("https://", adapter)
+        return session
 
     @property
     def configs(self):
@@ -67,7 +96,9 @@ class SpoonacularClient:
                 "ranking": 2,
                 "apiKey": self.api_key,
             }
-            resp = requests.get(api_url, params=params)
+            resp = SpoonacularClient.requests_retry_session().get(
+                api_url, params=params
+            )
             resp.raise_for_status()
             return resp.json()
         except Exception as exp:
@@ -139,7 +170,6 @@ class SpoonacularClient:
                 liked_count += 1
 
             elif like_dislike.lower().strip() == SpoonacularEnums.EXIT.value:
-                self.shopping_list.extend(recipe["missedIngredients"])
                 break
         self.user_stats = {"liked": liked_count, "total_count": total_count}
         return self.shopping_list
@@ -161,7 +191,7 @@ class SpoonacularClient:
                     "Name": i["name"],
                     "Aisle name": i["aisle"],
                     "Unit": i["unit"],
-                    "Amount": str(i["amount"]) + "$",
+                    "Amount": str(round(i["amount"], 2)) + "$",
                 }
             )
             cnt += 1
@@ -171,6 +201,6 @@ class SpoonacularClient:
         print(
             self.configs["thankYouShopping"].format(
                 liked_count=self.user_stats["liked"],
-                total_count=self.user_stats["total_count"]
+                total_count=self.user_stats["total_count"],
             )
         )
