@@ -1,16 +1,17 @@
-**Steps to run the setup**
+**About**
+SpoonacularCLI is 
 
 
 
 
 
 
-**How to run this project**
+**How to run**
 1. Open a terminal directly or through any of your favorite IDEs (PyCharm/VSCode)
 2. Type in `git clone https://github.com/pratik180791/SpoonacularCLI.git`
 3. Step 2 will clone down the repo for you. Once done you can check if the repository root folder `SpoonacularCLI` is created using two ways.
- * Running `ls` command if you are on Mac/Linux or in an IDE terminal
- * By Simply checking the folder structure through windows explorer if on WindowsOS
+   * Running `ls` command if you are on Mac/Linux or in an IDE terminal
+   * By Simply checking the folder structure through windows explorer if on WindowsOS
 4. Once confirmed that the project is cloned, please run `cd SpoonacularCLI` on your terminal 
 5. If you are reading this, you probably made it to the point of cloning and entering in the project root folder.
 6. Stay on the terminal and run `pwd`, it should return something a path ending with `/SpoonacularCLI`
