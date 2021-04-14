@@ -1,3 +1,7 @@
+"""
+Placeholder for custom exception handling
+"""
+
 class ServiceCallException(Exception):
     pass
 
@@ -12,6 +16,7 @@ class InvalidInputException(Exception):
 
 class UnknownException(Exception):
     pass
+
 
 class SpoonacularClientException(Exception):
     pass

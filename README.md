@@ -1,12 +1,14 @@
-**About**
-SpoonacularCLI is 
+***SpoonacularCLI***
+
+SpoonacularCLI is an interactive tool to choose from a wide range of food recipes based on the provided ingredient, on exit, display the chosen recipe’s missing ingredients and stop the shopping experience.
 
 
 
 
 
 
-**How to run**
+
+**HOW TO**
 1. Open a terminal directly or through any of your favorite IDEs (PyCharm/VSCode)
 2. Type in `git clone https://github.com/pratik180791/SpoonacularCLI.git`
 3. Step 2 will clone down the repo for you. Once done you can check if the repository root folder `SpoonacularCLI` is created using two ways.
