@@ -2,10 +2,7 @@
 
 SpoonacularCLI is an interactive tool to choose from a wide range of food recipes based on the provided ingredient, on exit, display the chosen recipe’s missing ingredients and stop the shopping experience.
 
-
-
-
-
+[User documentation](https://github.com/pratik180791/SpoonacularCLI/blob/main/docs/SpoonacularCLI.pdf)
 
 
 **HOW TO**
